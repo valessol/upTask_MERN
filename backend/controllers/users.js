@@ -99,3 +99,24 @@ export const checkToken = async (req, res) => {
     return res.status(404).json({ msg: error.message });
   }
 };
+
+export const createNewPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  const validUser = await User.findOne({ token });
+
+  if (validUser) {
+    validUser.password = password;
+    validUser.token = "";
+    try {
+      await validUser.save();
+      res.json({ msg: "Password modificado correctamente" });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const error = new Error("Token no válido");
+    return res.status(404).json({ msg: error.message });
+  }
+};
