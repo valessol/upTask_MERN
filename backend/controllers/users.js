@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import generateId from "../helpers/generateId.js";
+import generateJWT from "../helpers/generateJWT.js";
 
 export const getUsers = async (req, res) => {};
 
@@ -41,9 +42,29 @@ export const auth = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      token: generateJWT(user._id),
     });
   } else {
     const error = new Error("El password es incorrecto");
     return res.status(403).json({ msg: error.message });
+  }
+};
+
+export const confirm = async (req, res) => {
+  const { token } = req.params;
+  const confirmedUser = await User.findOne({ token });
+
+  if (!confirmedUser) {
+    const error = new Error("Token no válido");
+    return res.status(403).json({ msg: error.message });
+  }
+
+  try {
+    confirmedUser.confirmed = true;
+    confirmedUser.token = "";
+    await confirmedUser.save();
+    res.json({ msg: "Usuario confirmado correctamente" });
+  } catch (error) {
+    console.log(error);
   }
 };
