@@ -14,7 +14,7 @@ export const register = async (req, res) => {
   }
   try {
     const user = new User(req.body);
-    user.token = generateId();
+    user.token = generateId(); // este token es de confirmación de mail del usuario. Una vez confirmado, el token se resetea a ""
     const savedUser = await user.save();
     res.json(savedUser);
   } catch (error) {
@@ -22,7 +22,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const auth = async (req, res) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
 
@@ -42,7 +42,7 @@ export const auth = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateJWT(user._id),
+      token: generateJWT(user._id), // este token no se guarda en ningun lado, es de autenticación, se envía a frontend
     });
   } else {
     const error = new Error("El password es incorrecto");
@@ -50,7 +50,7 @@ export const auth = async (req, res) => {
   }
 };
 
-export const confirm = async (req, res) => {
+export const emailConfirmation = async (req, res) => {
   const { token } = req.params;
   const confirmedUser = await User.findOne({ token });
 
@@ -66,5 +66,36 @@ export const confirm = async (req, res) => {
     res.json({ msg: "Usuario confirmado correctamente" });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    const error = new Error("El usuario no existe");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    user.token = generateId(); // este token se regenera para que el usuario pueda volver a generar su clave
+    await user.save();
+    res.json({ msg: "Hemos enviado un email con las instrucciones" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const checkToken = async (req, res) => {
+  const { token } = req.params;
+  const validUser = await User.findOne({ token });
+
+  if (validUser) {
+    res.json({ msg: "Token válido, el usuario existe" });
+  } else {
+    const error = new Error("Token no válido");
+    return res.status(404).json({ msg: error.message });
   }
 };
