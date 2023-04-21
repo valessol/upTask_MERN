@@ -1,5 +1,23 @@
 import Project from "../models/Project.js";
 
+const getCheckedProject = async (projectId, userId) => {
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    const error = new Error("Proyecto no encontrado");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  const isOwner = project.creator.toString() === userId.toString();
+
+  if (!isOwner) {
+    const error = new Error("No autorizado");
+    return res.status(401).json({ msg: error.message });
+  }
+
+  return project;
+};
+
 export const getProjects = async (req, res) => {
   const projects = await Project.find().where("creator").equals(req.user);
   res.json(projects);
@@ -19,38 +37,14 @@ export const createNewProject = async (req, res) => {
 
 export const getProject = async (req, res) => {
   const { id } = req.params;
-  const project = await Project.findById(id);
-
-  if (!project) {
-    const error = new Error("Proyecto no encontrado");
-    return res.status(404).json({ msg: error.message });
-  }
-
-  const isOwner = project.creator.toString() === req.user._id.toString();
-
-  if (!isOwner) {
-    const error = new Error("No autorizado");
-    return res.status(401).json({ msg: error.message });
-  }
+  const project = await getCheckedProject(id, req.user._id);
 
   res.json(project);
 };
 
 export const editProject = async (req, res) => {
   const { id } = req.params;
-  const project = await Project.findById(id);
-
-  if (!project) {
-    const error = new Error("No encontrado");
-    return res.status(404).json({ msg: error.message });
-  }
-
-  const isOwner = project.creator.toString() === req.user._id.toString();
-
-  if (!isOwner) {
-    const error = new Error("Acción no válida");
-    return res.status(401).json({ msg: error.message });
-  }
+  const project = await getCheckedProject(id, req.user._id);
 
   Object.entries(req.body).forEach(([key, value]) => {
     project[key] = value;
@@ -66,19 +60,7 @@ export const editProject = async (req, res) => {
 
 export const deleteProject = async (req, res) => {
   const { id } = req.params;
-  const project = await Project.findById(id);
-
-  if (!project) {
-    const error = new Error("No encontrado");
-    return res.status(404).json({ msg: error.message });
-  }
-
-  const isOwner = project.creator.toString() === req.user._id.toString();
-
-  if (!isOwner) {
-    const error = new Error("Acción no válida");
-    return res.status(401).json({ msg: error.message });
-  }
+  const project = await getCheckedProject(id, req.user._id);
 
   try {
     await project.deleteOne();
