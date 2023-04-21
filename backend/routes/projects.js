@@ -13,7 +13,6 @@ router
   .get(checkAuth, projectsController.getProject)
   .put(checkAuth, projectsController.editProject)
   .delete(checkAuth, projectsController.deleteProject);
-router.get("/tasks/:id", checkAuth, projectsController.getTasks);
 router.post("/add-collaborator", checkAuth, projectsController.addCollaborator);
 router.post(
   "/delete-collaborator",

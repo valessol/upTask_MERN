@@ -1,4 +1,5 @@
 import Project from "../models/Project.js";
+import Task from "../models/Task.js";
 
 const getCheckedProject = async (projectId, userId) => {
   const project = await Project.findById(projectId);
@@ -38,8 +39,9 @@ export const createNewProject = async (req, res) => {
 export const getProject = async (req, res) => {
   const { id } = req.params;
   const project = await getCheckedProject(id, req.user._id);
+  const tasks = await Task.find().where("project").equals(project._id);
 
-  res.json(project);
+  res.json({ project, tasks });
 };
 
 export const editProject = async (req, res) => {
@@ -73,5 +75,3 @@ export const deleteProject = async (req, res) => {
 export const addCollaborator = async (req, res) => {};
 
 export const deleteCollaborator = async (req, res) => {};
-
-export const getTasks = async (req, res) => {};
