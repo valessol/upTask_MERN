@@ -50,7 +50,7 @@ export const login = async (req, res) => {
   }
 };
 
-export const emailConfirmation = async (req, res) => {
+export const checkAccountVerificationToken = async (req, res) => {
   const { token } = req.params;
   const confirmedUser = await User.findOne({ token });
 
@@ -88,7 +88,7 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-export const checkToken = async (req, res) => {
+export const checkNewAccountVerificationToken = async (req, res) => {
   const { token } = req.params;
   const validUser = await User.findOne({ token });
 
@@ -119,4 +119,10 @@ export const createNewPassword = async (req, res) => {
     const error = new Error("Token no válido");
     return res.status(404).json({ msg: error.message });
   }
+};
+
+export const getProfile = async (req, res) => {
+  const { user } = req;
+
+  res.json(user);
 };
