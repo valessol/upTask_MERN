@@ -1,13 +1,92 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import Alert from "../components/Alert";
 
 const Register = () => {
+  const [values, setValues] = useState({
+    name: "",
+    email: "",
+    password: "",
+    repeatPassword: "",
+  });
+  const [alert, setAlert] = useState({});
+
+  const validateFormValues = () => {
+    const { password, repeatPassword } = values;
+    const allFieldsCompleted = !Object.values(values).includes("");
+
+    if (!allFieldsCompleted) {
+      setAlert({
+        msg: "Todos los campos son obligatorios",
+        type: "error",
+      });
+      return false;
+    }
+
+    const areValidPasswords = password === repeatPassword;
+    if (!areValidPasswords) {
+      setAlert({
+        msg: "Los passwords no coinciden",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (password.length < 6) {
+      setAlert({
+        msg: "Agrega un password de al menos 6 caracteres",
+        type: "error",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleChange = (e) => {
+    setAlert({});
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const areValidValues = validateFormValues();
+
+    if (!areValidValues) return;
+
+    try {
+      const { password, name, email } = values;
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users`,
+        {
+          name,
+          email,
+          password,
+        }
+      );
+      setAlert({ msg: data.msg, type: "success" });
+    } catch (error) {
+      setAlert({ msg: error.response.data.msg, type: "error" });
+    }
+    setValues({ name: "", email: "", password: "", repeatPassword: "" });
+  };
+
   return (
     <>
       <h1 className="text-sky-600 font-black text-6xl capitalize">
         Crea tu cuenta para administrar tus{" "}
         <span className="text-slate-700">proyectos</span>
       </h1>
-      <form className="my-10 bg-white shadow rounded-lg p-10">
+
+      {alert.msg && <Alert alert={alert} />}
+      <form
+        className="my-10 bg-white shadow rounded-lg p-10"
+        onSubmit={handleSubmit}
+      >
         <div>
           <label
             className="uppercase text-gray-600 block text-xl font-bold"
@@ -17,9 +96,12 @@ const Register = () => {
           </label>
           <input
             id="name"
+            name="name"
             type="text"
             placeholder="John Doe"
             className="w-full mt-3 p-3 corder rounded-xl bg-gray-50"
+            value={values.name}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -31,9 +113,12 @@ const Register = () => {
           </label>
           <input
             id="email"
+            name="email"
             type="email"
             placeholder="example@example.com"
             className="w-full mt-3 p-3 corder rounded-xl bg-gray-50"
+            value={values.email}
+            onChange={handleChange}
           />
         </div>
         <div>
@@ -45,23 +130,29 @@ const Register = () => {
           </label>
           <input
             id="password"
-            type="passwrod"
+            name="password"
+            type="password"
             placeholder="********"
             className="w-full mt-3 p-3 corder rounded-xl bg-gray-50"
+            value={values.password}
+            onChange={handleChange}
           />
         </div>
         <div>
           <label
             className="uppercase text-gray-600 block text-xl font-bold"
-            htmlFor="password-repeat"
+            htmlFor="repeatPassword"
           >
             Repetir Password
           </label>
           <input
-            id="password-repeat"
-            type="passwrod"
+            id="repeatPassword"
+            name="repeatPassword"
+            type="password"
             placeholder="********"
             className="w-full mt-3 p-3 corder rounded-xl bg-gray-50"
+            value={values.repeatPassword}
+            onChange={handleChange}
           />
         </div>
 
