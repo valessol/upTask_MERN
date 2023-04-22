@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import generateId from "../helpers/generateId.js";
 import generateJWT from "../helpers/generateJWT.js";
+import { registerEmail, resetPasswordEmail } from "../helpers/email.js";
 
 export const getUsers = async (req, res) => {};
 
@@ -15,8 +16,16 @@ export const register = async (req, res) => {
   try {
     const user = new User(req.body);
     user.token = generateId(); // este token es de confirmación de mail del usuario. Una vez confirmado, el token se resetea a ""
-    const savedUser = await user.save();
-    res.json(savedUser);
+    await user.save();
+    // Enviar email de confirmación
+    await registerEmail({
+      email: user.email,
+      name: user.name,
+      token: user.token,
+    });
+    res.json({
+      msg: "Registrado con éxito. Revisa tu email para verificar tu cuenta",
+    });
   } catch (error) {
     console.log(error);
   }
@@ -82,6 +91,13 @@ export const resetPassword = async (req, res) => {
   try {
     user.token = generateId(); // este token se regenera para que el usuario pueda volver a generar su clave
     await user.save();
+
+    resetPasswordEmail({
+      email: user.email,
+      name: user.name,
+      token: user.token,
+    });
+
     res.json({ msg: "Hemos enviado un email con las instrucciones" });
   } catch (error) {
     console.log(error);
