@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Alert from "../components/Alert";
-import axios from "axios";
+import axiosClient from "../config/axiosClient";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
@@ -19,10 +19,9 @@ const ResetPassword = () => {
       return setAlert({ msg: "El email es obligatorio", type: "error" });
 
     try {
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/reset-password`,
-        { email }
-      );
+      const { data } = await axiosClient.post(`/users/reset-password`, {
+        email,
+      });
       setAlert({ msg: data.msg, type: "success" });
     } catch (error) {
       setAlert({ msg: error.response.data.msg, type: "error" });

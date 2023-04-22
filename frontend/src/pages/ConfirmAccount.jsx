@@ -1,7 +1,7 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../components/Alert";
+import axiosClient from "../config/axiosClient";
 
 const ConfirmAccount = () => {
   const [alert, setAlert] = useState({});
@@ -11,10 +11,7 @@ const ConfirmAccount = () => {
   useEffect(() => {
     const confirmAccount = async () => {
       try {
-        const url = `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/users/confirm/${id}`;
-        const { data } = await axios(url);
+        const { data } = await axiosClient(`/users/confirm/${id}`);
         setAlert({ msg: data.msg, type: "success" });
         setTimeout(() => {
           navigate("/");

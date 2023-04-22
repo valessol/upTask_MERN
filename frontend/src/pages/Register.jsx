@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import Alert from "../components/Alert";
+import axiosClient from "../config/axiosClient";
 
 const Register = () => {
   const [values, setValues] = useState({
@@ -60,14 +60,11 @@ const Register = () => {
 
     try {
       const { password, name, email } = values;
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users`,
-        {
-          name,
-          email,
-          password,
-        }
-      );
+      const { data } = await axiosClient.post(`/users`, {
+        name,
+        email,
+        password,
+      });
       setAlert({ msg: data.msg, type: "success" });
     } catch (error) {
       setAlert({ msg: error.response.data.msg, type: "error" });
