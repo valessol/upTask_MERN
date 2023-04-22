@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../components/Alert";
 import axiosClient from "../config/axiosClient";
+import Spinner from "../components/Spinner";
 
 const CreateNewPassword = () => {
   const [alert, setAlert] = useState({});
   const [validToken, setValidToken] = useState(false);
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { token } = useParams();
   const navigate = useNavigate();
 
@@ -43,10 +45,12 @@ const CreateNewPassword = () => {
         { password }
       );
       setAlert({ msg: data.msg, type: "success" });
+      setLoading(true);
       setTimeout(() => {
         navigate("/");
       }, 3000);
     } catch (error) {
+      setLoading(false);
       setAlert({ msg: error.response.data.msg, type: "error" });
     }
   };
@@ -87,6 +91,7 @@ const CreateNewPassword = () => {
           />
         </form>
       )}
+      {loading && <Spinner text="Redirigiendo para iniciar sesión" />}
     </>
   );
 };

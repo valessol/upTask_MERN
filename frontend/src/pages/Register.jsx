@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Alert from "../components/Alert";
 import axiosClient from "../config/axiosClient";
+import Spinner from "../components/Spinner";
 
 const Register = () => {
   const [values, setValues] = useState({
@@ -11,6 +12,7 @@ const Register = () => {
     repeatPassword: "",
   });
   const [alert, setAlert] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const validateFormValues = () => {
     const { password, repeatPassword } = values;
@@ -46,6 +48,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     setAlert({});
+    setLoading(false);
     setValues({
       ...values,
       [e.target.name]: e.target.value,
@@ -54,9 +57,12 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const areValidValues = validateFormValues();
 
-    if (!areValidValues) return;
+    if (!areValidValues) {
+      return setLoading(false);
+    }
 
     try {
       const { password, name, email } = values;
@@ -69,6 +75,7 @@ const Register = () => {
     } catch (error) {
       setAlert({ msg: error.response.data.msg, type: "error" });
     }
+    setLoading(false);
     setValues({ name: "", email: "", password: "", repeatPassword: "" });
   };
 
@@ -153,11 +160,29 @@ const Register = () => {
           />
         </div>
 
-        <input
-          type="submit"
-          value="Crear Cuenta"
-          className="bg-sky-700 w-full py-3 my-5 text-white uppercase font-bold rounded hover:cursor-pointer hover:bg-sky-800 transition-colors"
-        />
+        {loading ? (
+          <button
+            type="submit"
+            className="bg-sky-700 w-full py-3 my-5 text-white uppercase font-bold rounded hover:cursor-pointer hover:bg-sky-800 transition-colors"
+          >
+            <Spinner
+              style={{
+                margin: "0",
+                width: "24px",
+                height: "24px",
+                display: "inline-block",
+                color: "white",
+              }}
+            />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className="bg-sky-700 w-full py-3 my-5 text-white uppercase font-bold rounded hover:cursor-pointer hover:bg-sky-800 transition-colors"
+          >
+            Crear cuenta
+          </button>
+        )}
       </form>
 
       <nav className="lg:flex lg:justify-between">

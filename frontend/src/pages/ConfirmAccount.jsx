@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../components/Alert";
 import axiosClient from "../config/axiosClient";
+import Spinner from "../components/Spinner";
 
 const ConfirmAccount = () => {
   const [alert, setAlert] = useState({});
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -13,11 +15,13 @@ const ConfirmAccount = () => {
       try {
         const { data } = await axiosClient(`/users/confirm/${id}`);
         setAlert({ msg: data.msg, type: "success" });
+        setLoading(true);
         setTimeout(() => {
           navigate("/");
         }, 3000);
       } catch (error) {
         setAlert({ msg: error.response.data.msg, type: "error" });
+        setLoading(false);
       }
     };
     confirmAccount();
@@ -30,6 +34,7 @@ const ConfirmAccount = () => {
         <span className="text-slate-700">proyectos</span>
       </h1>
       <div>{alert.msg && <Alert alert={alert} />}</div>
+      {loading && <Spinner text="Redirigiendo para iniciar sesión" />}
     </>
   );
 };
