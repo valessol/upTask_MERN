@@ -39,9 +39,10 @@ export const createNewProject = async (req, res) => {
 export const getProject = async (req, res) => {
   const { id } = req.params;
   const project = await getCheckedProject(id, req.user._id);
-  const tasks = await Task.find().where("project").equals(project._id);
+  //const tasks = await Task.find().where("project").equals(project._id);
 
-  res.json({ project, tasks });
+  //res.json({ project, tasks });
+  res.json(project);
 };
 
 export const editProject = async (req, res) => {

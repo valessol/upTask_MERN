@@ -19,6 +19,7 @@ const ConfirmAccount = () => {
         setTimeout(() => {
           navigate("/");
         }, 3000);
+        //TODO: ver porque muestra mesnaje de token no válido
       } catch (error) {
         setAlert({ msg: error.response.data.msg, type: "error" });
         setLoading(false);

@@ -1,4 +1,4 @@
-const Alert = ({ alert }) => {
+const Alert = ({ alert, cssStyles }) => {
   const messageClass = {
     error: "from-red-400 to-red-600",
     success: "from-sky-400 to-sky-600",
@@ -8,7 +8,9 @@ const Alert = ({ alert }) => {
     <div
       className={`${
         messageClass[alert.type]
-      } bg-gradient-to-br text-center p-3 rounded-xl uppercase, text-white font-bold text-sm my-10`}
+      } bg-gradient-to-br text-center p-3 rounded-xl uppercase text-white font-bold text-sm my-10 ${
+        cssStyles ? cssStyles : ""
+      }`}
     >
       {alert.msg}
     </div>

@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axiosClient from "../config/axiosClient";
 import Alert from "../components/Alert";
+import useAuth from "../hooks/useAuth";
 
 const Login = () => {
-  const [values, setValues] = useState({
-    email: "",
-    password: "",
-  });
+  const [values, setValues] = useState({ email: "", password: "" });
   const [alert, setAlert] = useState({});
   //TODO: Añadir Spinner
   const [loading, setLoading] = useState(false);
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
 
   const validateFormValues = () => {
     const allFieldsCompleted = !Object.values(values).includes("");
@@ -50,7 +50,14 @@ const Login = () => {
         password,
       });
       localStorage.setItem("token", data.token);
-      setAlert({ msg: data.msg, type: "success" });
+      setAuth(data);
+      setAlert({
+        msg: "Has iniciado sesión correctamente, redirigiendo a tus proyectos...",
+        type: "success",
+      });
+      setTimeout(() => {
+        navigate("/proyectos");
+      }, 3000);
     } catch (error) {
       setAlert({ msg: error.response.data.msg, type: "error" });
     }

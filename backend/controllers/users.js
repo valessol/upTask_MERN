@@ -3,8 +3,6 @@ import generateId from "../helpers/generateId.js";
 import generateJWT from "../helpers/generateJWT.js";
 import { registerEmail, resetPasswordEmail } from "../helpers/email.js";
 
-export const getUsers = async (req, res) => {};
-
 export const register = async (req, res) => {
   const { email } = req.body;
   const existUser = await User.findOne({ email });
