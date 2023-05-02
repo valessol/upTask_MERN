@@ -1,8 +1,7 @@
 import Project from "../models/Project.js";
-import Task from "../models/Task.js";
 
 const getCheckedProject = async (projectId, userId) => {
-  const project = await Project.findById(projectId);
+  const project = await Project.findById(projectId).populate("tasks");
 
   if (!project) {
     const error = new Error("Proyecto no encontrado");
@@ -20,7 +19,10 @@ const getCheckedProject = async (projectId, userId) => {
 };
 
 export const getProjects = async (req, res) => {
-  const projects = await Project.find().where("creator").equals(req.user);
+  const projects = await Project.find()
+    .where("creator")
+    .equals(req.user)
+    .select("-tasks");
   res.json(projects);
 };
 
