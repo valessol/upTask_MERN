@@ -38,6 +38,9 @@ export const addTask = async (req, res) => {
 
   try {
     const createdTask = await Task.create(req.body);
+    // Almacenar el Id de tarea en el proyecto
+    existProject.tasks.push(createdTask._id);
+    await existProject.save();
     res.json(createdTask);
   } catch (error) {
     console.log(error);
@@ -74,7 +77,7 @@ export const deleteTask = async (req, res) => {
 
   try {
     await task.deleteOne();
-    res.json({ msg: "Tarea eliminada" });
+    res.json({ msg: "Tarea eliminada correctamente" });
   } catch (error) {
     return res.json({ msg: error.message });
   }
