@@ -4,6 +4,7 @@ import Alert from "./Alert";
 import useProjects from "../hooks/useProjects";
 import Spinner from "./Spinner";
 import { useNavigate, useParams } from "react-router-dom";
+import Fields from "./Fields";
 
 const ProjectForm = () => {
   const [values, setValues] = useState({
@@ -12,7 +13,7 @@ const ProjectForm = () => {
     finishDate: "",
     client: "",
   });
-  // const [alert, setAlert] = useState({});
+
   const { submitProject, project, loading, alert, setAlert } = useProjects();
   const navigate = useNavigate();
   const params = useParams();
@@ -56,46 +57,14 @@ const ProjectForm = () => {
       client: "",
     });
   };
-  console.log({ alert });
+
   return (
     <form
       className="bg-white py-10 px-5 md:w-1/2 rounded-lg shadow"
       onSubmit={handleSubmit}
     >
       {alert?.msg && <Alert alert={alert} cssStyles="mt-0" />}
-      {newProjectForm.map((item) => {
-        const { label, id, type, placeholder } = item;
-        return (
-          <div key={id}>
-            <label
-              className="text-gray-700 uppercase font-bold text-sm"
-              htmlFor={id}
-            >
-              {label}:
-            </label>
-            {type === "textarea" ? (
-              <textarea
-                id={id}
-                className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-                placeholder={placeholder}
-                onChange={handleChange}
-                name={id}
-                value={values[id]}
-              />
-            ) : (
-              <input
-                id={id}
-                type={type}
-                className="border w-full p-2 mt-2 placeholder-gray-400 rounded-md"
-                placeholder={placeholder || null}
-                onChange={handleChange}
-                name={id}
-                value={values[id]}
-              />
-            )}
-          </div>
-        );
-      })}
+      <Fields fields={newProjectForm} onChange={handleChange} values={values} />
 
       {loading ? (
         <button
