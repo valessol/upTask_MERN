@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axiosClient from "../config/axiosClient";
 import Alert from "../components/Alert";
 import useAuth from "../hooks/useAuth";
+import useProjects from "../hooks/useProjects";
 
 const Login = () => {
   const [values, setValues] = useState({ email: "", password: "" });
@@ -10,6 +11,7 @@ const Login = () => {
   //TODO: Añadir Spinner
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuth();
+  const { setDone } = useProjects();
   const navigate = useNavigate();
 
   const validateFormValues = () => {
@@ -55,9 +57,8 @@ const Login = () => {
         msg: "Has iniciado sesión correctamente, redirigiendo a tus proyectos...",
         type: "success",
       });
-      setTimeout(() => {
-        navigate("/proyectos");
-      }, 3000);
+      setDone(true);
+      navigate("/proyectos");
     } catch (error) {
       setAlert({ msg: error.response.data.msg, type: "error" });
     }
