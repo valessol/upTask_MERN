@@ -106,6 +106,7 @@ export const changeTaskState = async (req, res) => {
   }
 
   task.state = !task.state;
+  task.completed = req.user._id;
   await task.save();
   res.json(task);
 };
