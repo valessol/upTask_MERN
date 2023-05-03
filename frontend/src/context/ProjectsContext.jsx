@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axiosClient from "../config/axiosClient";
+import { useNavigate } from "react-router-dom";
 
 export const ProjectsContext = createContext();
 
@@ -11,7 +12,8 @@ const ProjectsProvider = ({ children }) => {
   const [collaborator, setCollaborator] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(false);
-  console.log(done, projects);
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!projects) {
       if (done) getProjects();
@@ -125,10 +127,12 @@ const ProjectsProvider = ({ children }) => {
       setProject(data);
       setAlert({});
     } catch (error) {
+      navigate("/projects");
       setAlert({
         msg: error.response.data.msg,
         type: "error",
       });
+      setTimeout(() => setAlert({}), 3000);
     }
     setLoading(false);
   };

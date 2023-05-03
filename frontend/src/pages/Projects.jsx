@@ -1,11 +1,13 @@
+import Alert from "../components/Alert";
 import ProjectsPreview from "../components/ProjectsPreview";
 import useProjects from "../hooks/useProjects";
 
 const Projects = () => {
-  const { projects, loading } = useProjects();
+  const { projects, loading, alert } = useProjects();
   return (
     <>
       <h1 className="text-4xl font-black">Proyectos</h1>
+      {alert.msg && <Alert alert={alert} />}
       <div className="bg-white shadow mt-10 rounded-lg">
         {projects?.length ? (
           projects.map((proj) => <ProjectsPreview key={proj._id} data={proj} />)
