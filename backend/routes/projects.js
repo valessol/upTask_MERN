@@ -13,9 +13,14 @@ router
   .get(checkAuth, projectsController.getProject)
   .put(checkAuth, projectsController.editProject)
   .delete(checkAuth, projectsController.deleteProject);
-router.post("/add-collaborator", checkAuth, projectsController.addCollaborator);
+router.post("/collaborators", checkAuth, projectsController.searchCollaborator);
 router.post(
-  "/delete-collaborator",
+  "/collaborators/:id",
+  checkAuth,
+  projectsController.addCollaborator
+);
+router.delete(
+  "/collaborators/:id",
   checkAuth,
   projectsController.deleteCollaborator
 );
