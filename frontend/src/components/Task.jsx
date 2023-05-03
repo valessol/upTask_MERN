@@ -3,10 +3,12 @@ import { formatDate } from "../helpers/formatDate";
 import useProjects from "../hooks/useProjects";
 import Modal from "./Modal";
 import DialogModal from "./DialogModal";
+import useAdmin from "../hooks/useAdmin";
 
 const Task = ({ task }) => {
   const [dialogModal, setDialogModal] = useState(false);
-  const { setModal, deleteTask } = useProjects();
+  const { setModal, deleteTask, completeTask } = useProjects();
+  const isAdmin = useAdmin();
   const { description, name, priority, finishDate, state, _id } = task;
 
   const handleEditClick = () => {
@@ -31,29 +33,32 @@ const Task = ({ task }) => {
         <p className="mb-1 text-gray-600">Prioridad: {priority}</p>
       </div>
       <div className="flex gap-2">
-        <button
-          className="bg-indigo-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-          onClick={handleEditClick}
-        >
-          Editar
-        </button>
-
-        {state ? (
-          <button className="bg-sky-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg">
-            Completa
-          </button>
-        ) : (
-          <button className="bg-gray-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg">
-            Incompleta
+        {isAdmin && (
+          <button
+            className="bg-indigo-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
+            onClick={handleEditClick}
+          >
+            Editar
           </button>
         )}
 
         <button
-          className="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-          onClick={() => setDialogModal(true)}
+          className={`${
+            state ? "bg-sky-600" : "bg-gray-600"
+          } px-4 py-3 text-white uppercase font-bold text-sm rounded-lg`}
+          onClick={() => completeTask(_id)}
         >
-          Eliminar
+          {state ? "Completa" : "Incompleta"}
         </button>
+
+        {isAdmin && (
+          <button
+            className="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
+            onClick={() => setDialogModal(true)}
+          >
+            Eliminar
+          </button>
+        )}
       </div>
 
       <Modal />
