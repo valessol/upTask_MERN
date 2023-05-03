@@ -123,6 +123,7 @@ const ProjectsProvider = ({ children }) => {
 
       const { data } = await axiosClient(`/projects/${id}`, config);
       setProject(data);
+      setAlert({});
     } catch (error) {
       setAlert({
         msg: error.response.data.msg,
@@ -319,6 +320,31 @@ const ProjectsProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const completeTask = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      };
+      const { data } = await axiosClient.post(`/tasks/state/${id}`, {}, config);
+      const updatedProject = {
+        ...project,
+        tasks: [
+          ...project.tasks.map((task) => (task._id === data._id ? data : task)),
+        ],
+      };
+      setProject(updatedProject);
+      setAlert({});
+    } catch (error) {
+      setAlert({ msg: error.response.data.msg, type: "error" });
+    }
+  };
+
   return (
     <ProjectsContext.Provider
       value={{
@@ -340,6 +366,7 @@ const ProjectsProvider = ({ children }) => {
         searchCollaborator,
         addCollaborator,
         deleteCollaborator,
+        completeTask,
       }}
     >
       {children}

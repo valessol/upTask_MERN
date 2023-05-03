@@ -83,4 +83,26 @@ export const deleteTask = async (req, res) => {
   }
 };
 
-export const changeTaskState = async (req, res) => {};
+export const changeTaskState = async (req, res) => {
+  const { id } = req.params;
+  const task = await Task.findById(id).populate("project");
+
+  if (!task) {
+    const error = new Error("La tarea no existe");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  const isOwner = task.project.toString() === req.user._id.toString();
+  const isCollaborator = task.project.collaborators.some(
+    (col) => col._id === req.user._id
+  );
+
+  if (!isOwner && !isCollaborator) {
+    const error = new Error("No autorizado");
+    return res.status(401).json({ msg: error.message });
+  }
+
+  task.state = !task.state;
+  await task.save();
+  res.json(task);
+};
