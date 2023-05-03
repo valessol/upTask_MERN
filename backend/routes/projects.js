@@ -19,8 +19,8 @@ router.post(
   checkAuth,
   projectsController.addCollaborator
 );
-router.delete(
-  "/collaborators/:id",
+router.post(
+  "/delete-collaborator/:id",
   checkAuth,
   projectsController.deleteCollaborator
 );

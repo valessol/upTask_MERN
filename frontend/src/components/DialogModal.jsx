@@ -1,7 +1,8 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-const DialogModal = ({ open, onClose, onSubmit }) => {
+const DialogModal = ({ open, onClose, onSubmit, content }) => {
+  const { title, text } = content;
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
@@ -82,12 +83,10 @@ const DialogModal = ({ open, onClose, onSubmit }) => {
                     as="h3"
                     className="text-lg leading-6 font-bold text-gray-900"
                   >
-                    Eliminar tarea
+                    {title}
                   </Dialog.Title>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Una tarea eliminada no se podrá recuperar
-                    </p>
+                    <p className="text-sm text-gray-500">{text}</p>
                   </div>
                 </div>
               </div>

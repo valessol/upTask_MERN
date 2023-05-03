@@ -61,6 +61,10 @@ const Task = ({ task }) => {
         open={dialogModal}
         onClose={() => setDialogModal(false)}
         onSubmit={handleDeleteTask}
+        content={{
+          title: "Eliminar tarea",
+          text: "Una tarea eliminada no se podrá recuperar",
+        }}
       />
     </div>
   );

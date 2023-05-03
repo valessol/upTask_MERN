@@ -20,10 +20,9 @@ const getCheckedProject = async (projectId, userId) => {
 };
 
 export const getProjects = async (req, res) => {
-  const projects = await Project.find()
-    .where("creator")
-    .equals(req.user)
-    .select("-tasks");
+  const projects = await Project.find({
+    $or: [{ collaborators: { $in: req.user } }, { creator: { $in: req.user } }],
+  }).select("-tasks");
   res.json(projects);
 };
 
@@ -41,10 +40,10 @@ export const createNewProject = async (req, res) => {
 
 export const getProject = async (req, res) => {
   const { id } = req.params;
-  const project = await getCheckedProject(id, req.user._id);
-  //const tasks = await Task.find().where("project").equals(project._id);
+  const project = await getCheckedProject(id, req.user._id)
+    .populate("collaborators")
+    .populate("collaborators", "name email");
 
-  //res.json({ project, tasks });
   res.json(project);
 };
 
@@ -127,7 +126,24 @@ export const addCollaborator = async (req, res) => {
 
   project.collaborators.push(user._id);
   await project.save();
-  res.json({ msg: "Colaborador agragado correctamente" });
+  res.json({ msg: "Colaborador agregado correctamente" });
 };
 
-export const deleteCollaborator = async (req, res) => {};
+export const deleteCollaborator = async (req, res) => {
+  const project = await Project.findById(req.params.id);
+
+  if (!project) {
+    const error = new Error("Proyecto no encontrado");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  // Comprobar que sólo el creador del proyecto puede añadir colaboradores
+  if (project.creator.toString() !== req.user._id.toString()) {
+    const error = new Error("Acción no válida");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  project.collaborators.pull(req.body._id);
+  await project.save();
+  res.json({ msg: "Colaborador eliminado correctamente" });
+};

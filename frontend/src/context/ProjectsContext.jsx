@@ -268,13 +268,48 @@ const ProjectsProvider = ({ children }) => {
         },
       };
       const { data } = await axiosClient.post(
-        `/projects/collaborators${project._id}`,
+        `/projects/collaborators/${project._id}`,
         email,
         config
       );
       setCollaborator(data);
       setAlert({ msg: data.msg, type: "success" });
       setCollaborator({});
+      setTimeout(() => {
+        setAlert({});
+      }, 3000);
+    } catch (error) {
+      setAlert({ msg: error.response.data.msg, type: "error" });
+    }
+    setLoading(false);
+  };
+
+  const deleteCollaborator = async (id) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      };
+      const { data } = await axiosClient.post(
+        `/projects/delete-collaborator/${project._id}`,
+        { id },
+        config
+      );
+      setAlert({ msg: data.msg, type: "success" });
+      setCollaborator({});
+      const updatedProject = {
+        ...project,
+        collaborators: [
+          ...project.collaborators.filter((col) => col._id !== id),
+        ],
+      };
+      setProject(updatedProject);
       setTimeout(() => {
         setAlert({});
       }, 3000);
@@ -304,6 +339,7 @@ const ProjectsProvider = ({ children }) => {
         collaborator,
         searchCollaborator,
         addCollaborator,
+        deleteCollaborator,
       }}
     >
       {children}

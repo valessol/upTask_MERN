@@ -5,6 +5,7 @@ import Spinner from "../components/Spinner";
 import Modal from "../components/Modal";
 import Task from "../components/Task";
 import Alert from "../components/Alert";
+import Collaborator from "../components/Collaborator";
 
 const Project = () => {
   const { id } = useParams();
@@ -102,6 +103,18 @@ const Project = () => {
             >
               Editar
             </Link>
+          </div>
+
+          <div className="bg-white shadow mt-10 rounded-lg">
+            {project?.collaborators?.length ? (
+              project.collaborators.map((col) => (
+                <Collaborator key={col._id} collaborator={col} />
+              ))
+            ) : (
+              <p className="text-center my-5 p-10">
+                No hay colaboradores en este proyecto
+              </p>
+            )}
           </div>
 
           <Modal />
