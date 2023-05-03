@@ -40,9 +40,24 @@ export const createNewProject = async (req, res) => {
 
 export const getProject = async (req, res) => {
   const { id } = req.params;
-  const project = await getCheckedProject(id, req.user._id)
-    .populate("collaborators")
+  const project = await Project.findById(id)
+    .populate("tasks")
     .populate("collaborators", "name email");
+
+  if (!project) {
+    const error = new Error("Proyecto no encontrado");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  const isOwner = project.creator.toString() === req.user._id.toString();
+  const isCollaborator = project.collaborators.some(
+    (col) => col._id === req.user._id
+  );
+
+  if (!isOwner && !isCollaborator) {
+    const error = new Error("No autorizado");
+    return res.status(401).json({ msg: error.message });
+  }
 
   res.json(project);
 };
