@@ -76,7 +76,10 @@ export const deleteTask = async (req, res) => {
   const task = await getCheckedTask(id, req.user._id);
 
   try {
-    await task.deleteOne();
+    const project = await Project.findById(task.project);
+    project.task.pull(task._id);
+
+    await Promise.allSettled([await project.save(), await task.deleteOne()]);
     res.json({ msg: "Tarea eliminada correctamente" });
   } catch (error) {
     return res.json({ msg: error.message });
