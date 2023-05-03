@@ -55,3 +55,13 @@ export const newTaskForm = [
     options: ["Baja", "Media", "Alta"],
   },
 ];
+
+export const newCollaboratorForm = [
+  {
+    id: "email",
+    element: "input",
+    type: "email",
+    placeholder: "example@example.com",
+    label: "Email del colaborador",
+  },
+];

@@ -8,6 +8,7 @@ const ProjectsProvider = ({ children }) => {
   const [modal, setModal] = useState({});
   const [projects, setProjects] = useState(null);
   const [project, setProject] = useState({});
+  const [collaborator, setCollaborator] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(false);
   console.log(done, projects);
@@ -123,7 +124,10 @@ const ProjectsProvider = ({ children }) => {
       const { data } = await axiosClient(`/projects/${id}`, config);
       setProject(data);
     } catch (error) {
-      console.log(error);
+      setAlert({
+        msg: error.response.data.msg,
+        type: "error",
+      });
     }
     setLoading(false);
   };
@@ -226,6 +230,60 @@ const ProjectsProvider = ({ children }) => {
     setLoading(false);
   };
 
+  const searchCollaborator = async (email) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      };
+      const { data } = await axiosClient.post(
+        `/projects/collaborators`,
+        { email },
+        config
+      );
+      setCollaborator(data);
+      setAlert({});
+    } catch (error) {
+      setAlert({ msg: error.response.data.msg, type: "error" });
+    }
+    setLoading(false);
+  };
+
+  const addCollaborator = async (email) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      };
+      const { data } = await axiosClient.post(
+        `/projects/collaborators${project._id}`,
+        email,
+        config
+      );
+      setCollaborator(data);
+      setAlert({ msg: data.msg, type: "success" });
+      setCollaborator({});
+      setTimeout(() => {
+        setAlert({});
+      }, 3000);
+    } catch (error) {
+      setAlert({ msg: error.response.data.msg, type: "error" });
+    }
+    setLoading(false);
+  };
+
   return (
     <ProjectsContext.Provider
       value={{
@@ -243,6 +301,9 @@ const ProjectsProvider = ({ children }) => {
         setModal,
         handleSubmitModal,
         deleteTask,
+        collaborator,
+        searchCollaborator,
+        addCollaborator,
       }}
     >
       {children}

@@ -93,6 +93,17 @@ const Project = () => {
             )}
           </div>
 
+          <div className="flex justify-between mt-10 items-center">
+            <p className="font-bold text-xl mt-10">Colaboradores</p>
+
+            <Link
+              to={`/proyectos/nuevo-colaborador/${id}`}
+              className="uppercase font-bold text-gray-400 hover:text-black"
+            >
+              Editar
+            </Link>
+          </div>
+
           <Modal />
         </>
       )}

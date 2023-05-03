@@ -12,6 +12,7 @@ import NewProject from "./pages/NewProject";
 import ProjectsProvider from "./context/ProjectsContext";
 import Project from "./pages/Project";
 import EditProject from "./pages/EditProject";
+import NewCollaborator from "./pages/NewCollaborator";
 
 function App() {
   return (
@@ -35,12 +36,10 @@ function App() {
               <Route path="nuevo" element={<NewProject />} />
               <Route path=":id" element={<Project />} />
               <Route path="editar/:id" element={<EditProject />} />
-              {/* <Route path="reset-password" element={<ResetPassword />} />
-            <Route
-              path="reset-password/:token"
-              element={<CreateNewPassword />}
-            />
-            <Route path="confirmar/:id" element={<ConfirmAccount />} /> */}
+              <Route
+                path="nuevo-colaborador/:id"
+                element={<NewCollaborator />}
+              />
             </Route>
           </Routes>
         </ProjectsProvider>
