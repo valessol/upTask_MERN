@@ -50,12 +50,10 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("Conectado a socket.io");
   socket.on("open-project", (projectId) => {
     socket.join(projectId);
   });
   socket.on("add-task", (task) => {
-    // emitir este evento solo a las personas que tengan abierto ese proyecto, es decir, que estén en la sala
     socket.on(task.project).emit("task-added", task);
   });
   socket.on("delete-task", (taskId) => {
