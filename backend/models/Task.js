@@ -33,6 +33,7 @@ const taskSchema = mongoose.Schema(
     completed: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: null,
     },
   },
   {

@@ -88,7 +88,9 @@ export const deleteTask = async (req, res) => {
 
 export const changeTaskState = async (req, res) => {
   const { id } = req.params;
-  const task = await Task.findById(id).populate("project");
+  const task = await Task.findById(id)
+    .populate("project")
+    .populate("completed");
 
   if (!task) {
     const error = new Error("La tarea no existe");
@@ -108,5 +110,8 @@ export const changeTaskState = async (req, res) => {
   task.state = !task.state;
   task.completed = req.user._id;
   await task.save();
-  res.json(task);
+  const savedTask = await Task.findById(id)
+    .populate("project")
+    .populate("completed");
+  res.json(savedTask);
 };

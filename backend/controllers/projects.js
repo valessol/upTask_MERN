@@ -41,7 +41,10 @@ export const createNewProject = async (req, res) => {
 export const getProject = async (req, res) => {
   const { id } = req.params;
   const project = await Project.findById(id)
-    .populate("tasks")
+    .populate({
+      path: "tasks",
+      populate: { path: "completed", select: "name" },
+    })
     .populate("collaborators", "name email");
 
   if (!project) {
