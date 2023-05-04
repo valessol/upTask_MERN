@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
-import useProjects from "../hooks/useProjects";
+import io from "socket.io-client";
 import { useEffect } from "react";
+import useProjects from "../hooks/useProjects";
 import Spinner from "../components/Spinner";
 import Modal from "../components/Modal";
 import Task from "../components/Task";
@@ -8,15 +9,50 @@ import Alert from "../components/Alert";
 import Collaborator from "../components/Collaborator";
 import useAdmin from "../hooks/useAdmin";
 
+let socket;
+
 const Project = () => {
   const { id } = useParams();
-  const { getProject, project, loading, alert, setModal } = useProjects();
+  const {
+    getProject,
+    project,
+    loading,
+    alert,
+    setModal,
+    submitProjectTasks,
+    deleteProjectTask,
+    editProjectTask,
+    changeTaskState,
+  } = useProjects();
   const isAdmin = useAdmin();
   const { name } = project;
 
   useEffect(() => {
     getProject(id);
   }, []);
+
+  useEffect(() => {
+    socket = io(import.meta.env.VITE_BACKEND_URL);
+    socket.emit("open-project", id);
+  }, []);
+
+  useEffect(() => {
+    socket.on("task-added", (task) => {
+      if (task.project === project._id) submitProjectTasks(task);
+    });
+
+    socket.on("task-deleted", (taskId) => {
+      deleteProjectTask(taskId);
+    });
+
+    socket.on("task-updated", (task) => {
+      if (task.project._id === project._id) editProjectTask(task);
+    });
+
+    socket.on("state-changed", (task) => {
+      if (task.project._id === project._id) changeTaskState(task);
+    });
+  });
 
   const handleClick = () => {
     setModal({

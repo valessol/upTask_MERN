@@ -34,6 +34,38 @@ app.use("/api/tasks", tasksRoutes);
 
 const PORT = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
+
+
+// Socket.io
+
+import {Server} 'socket.io'
+
+const io = new Server(server, {
+  pingTimeout: 30000,
+  cors: {
+    origin: process.env.FRONTEND_URL,
+  }
+})
+
+io.on('connection', (socket) => {
+  console.log('Conectado a socket.io')
+  socket.on('open-project', (projectId) => {
+    socket.join(projectId)
+  })
+  socket.on('add-task', task => {
+    // emitir este evento solo a las personas que tengan abierto ese proyecto, es decir, que estén en la sala
+    socket.on(task.project).emit('task-added', task)
+  })
+  socket.on('delete-task', taskId => {
+    socket.to(task.project).emit('task-deleted', taskId)
+  })
+  socket.on('update-task', task => {
+    socket.to(task.project._id).emit('task-updated', task)
+  })
+  socket.on('change-state', task => {
+    socket.to(task.project._id).emit('state-changed', task)
+  })
+})

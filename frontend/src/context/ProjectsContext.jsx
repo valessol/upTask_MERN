@@ -1,7 +1,9 @@
 import { createContext, useEffect, useState } from "react";
+import io from "socket.io-client";
 import axiosClient from "../config/axiosClient";
 import { useNavigate } from "react-router-dom";
 
+let socket;
 export const ProjectsContext = createContext();
 
 const ProjectsProvider = ({ children }) => {
@@ -23,6 +25,10 @@ const ProjectsProvider = ({ children }) => {
       else getProjects();
     }
   }, [projects, done]);
+
+  useEffect(() => {
+    socket = io(import.meta.env.VITE_BACKEND_URL);
+  }, []);
 
   const getProjects = async () => {
     console.log("getProjects");
@@ -178,23 +184,17 @@ const ProjectsProvider = ({ children }) => {
 
       if (!task._id) {
         const { data } = await axiosClient.post(`/tasks`, task, config);
-        const updatedProject = { ...project, tasks: [...project.tasks, data] };
-        setProject(updatedProject);
         setAlert({});
+
+        // Socket.io
+        socket.emit("add-task", data);
       } else {
-        console.log(task);
         const { data } = await axiosClient.put(
           `/tasks/${task._id}`,
           task,
           config
         );
-        const updatedProject = {
-          ...project,
-          tasks: project.tasks.map((taskState) =>
-            taskState._id === data._id ? data : taskState
-          ),
-        };
-        setProject(updatedProject);
+        socket.emit("update-task", data);
         setAlert({});
       }
     } catch (error) {
@@ -221,12 +221,9 @@ const ProjectsProvider = ({ children }) => {
         msg: data.msg,
         type: "success",
       });
-      const updatedProject = {
-        ...project,
-        tasks: [...project.tasks.filter((task) => task._id !== id)],
-      };
-      setProject(updatedProject);
-      setProject(updatedProject);
+
+      socket.emit("delete-task", id);
+
       setTimeout(() => setAlert({}), 3000);
     } catch (error) {
       console.log(error);
@@ -336,17 +333,49 @@ const ProjectsProvider = ({ children }) => {
         },
       };
       const { data } = await axiosClient.post(`/tasks/state/${id}`, {}, config);
-      const updatedProject = {
-        ...project,
-        tasks: [
-          ...project.tasks.map((task) => (task._id === data._id ? data : task)),
-        ],
-      };
-      setProject(updatedProject);
+
+      socket.emit("change-state", data);
       setAlert({});
     } catch (error) {
       setAlert({ msg: error.response.data.msg, type: "error" });
     }
+  };
+
+  // Socket.io
+  const submitProjectTasks = (task) => {
+    const updatedProject = { ...project, tasks: [...project.tasks, task] };
+    setProject(updatedProject);
+  };
+
+  const deleteProjectTask = (id) => {
+    const updatedProject = projects.find((project) =>
+      project.task.some((task) => task._id === id)
+    );
+    const newUpdatedProject = {
+      ...updatedProject,
+      tasks: [...updatedProject.tasks.filter((task) => task._id !== id)],
+    };
+    setProject(newUpdatedProject);
+  };
+
+  const editProjectTask = (task) => {
+    const updatedProject = {
+      ...project,
+      tasks: project.tasks.map((taskState) =>
+        taskState._id === task._id ? task : taskState
+      ),
+    };
+    setProject(updatedProject);
+  };
+
+  const changeTaskState = (task) => {
+    const updatedProject = {
+      ...project,
+      tasks: [
+        ...project.tasks.map((task) => (task._id === task._id ? task : task)),
+      ],
+    };
+    setProject(updatedProject);
   };
 
   return (
@@ -371,6 +400,10 @@ const ProjectsProvider = ({ children }) => {
         addCollaborator,
         deleteCollaborator,
         completeTask,
+        submitProjectTasks,
+        deleteProjectTask,
+        editProjectTask,
+        changeTaskState,
       }}
     >
       {children}
