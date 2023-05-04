@@ -2,29 +2,24 @@ import { createContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 import axiosClient from "../config/axiosClient";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 let socket;
 export const ProjectsContext = createContext();
 
 const ProjectsProvider = ({ children }) => {
-  const [done, setDone] = useState(false);
   const [modal, setModal] = useState({});
   const [projects, setProjects] = useState(null);
   const [project, setProject] = useState({});
   const [collaborator, setCollaborator] = useState({});
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(false);
+  const { auth } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!projects) {
-      if (done) getProjects();
-      else setProjects([]);
-    } else if (!projects.length) {
-      if (done) return;
-      else getProjects();
-    }
-  }, [projects, done]);
+    getProjects();
+  }, [auth]);
 
   useEffect(() => {
     socket = io(import.meta.env.VITE_BACKEND_URL);
@@ -372,7 +367,9 @@ const ProjectsProvider = ({ children }) => {
     const updatedProject = {
       ...project,
       tasks: [
-        ...project.tasks.map((task) => (task._id === task._id ? task : task)),
+        ...project.tasks.map((taskState) =>
+          taskState._id === task._id ? task : taskState
+        ),
       ],
     };
     setProject(updatedProject);
@@ -396,7 +393,6 @@ const ProjectsProvider = ({ children }) => {
         deleteProject,
         alert,
         setAlert,
-        setDone,
         modal,
         setModal,
         handleSubmitModal,
