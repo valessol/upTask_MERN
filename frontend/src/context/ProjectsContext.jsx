@@ -378,6 +378,12 @@ const ProjectsProvider = ({ children }) => {
     setProject(updatedProject);
   };
 
+  const projectsLogout = () => {
+    setProject({});
+    setProjects([]);
+    setAlert({});
+  };
+
   return (
     <ProjectsContext.Provider
       value={{
@@ -404,6 +410,7 @@ const ProjectsProvider = ({ children }) => {
         deleteProjectTask,
         editProjectTask,
         changeTaskState,
+        projectsLogout,
       }}
     >
       {children}

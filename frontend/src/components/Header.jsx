@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Search from "./Search";
+import useAuth from "../hooks/useAuth";
+import useProjects from "../hooks/useProjects";
 
 const Header = () => {
   const [modal, setModal] = useState(false);
+  const { authLogout } = useAuth();
+  const { projectsLogout } = useProjects();
 
   const handleClick = () => {
     setModal((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    authLogout();
+    projectsLogout();
+    localStorage.removeItem("token");
   };
 
   return (
@@ -31,6 +41,7 @@ const Header = () => {
           <button
             type="button"
             className="text-white text-sm bg-sky-600 p-3 rounded-md uppercase font-bold"
+            onClick={handleLogout}
           >
             Cerrar sesión
           </button>
