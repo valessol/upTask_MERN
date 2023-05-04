@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 import Search from "./Search";
 
 const Header = () => {
-  const [modal, setModal] = useState()
+  const [modal, setModal] = useState(false);
 
   const handleClick = () => {
-    setModal(prev => !prev)
-  }
+    setModal((prev) => !prev);
+  };
+
   return (
     <header className="px-4 py-5 bg-white border-b">
       <div className="md:flex md:justify-between">
@@ -16,7 +17,11 @@ const Header = () => {
         </h2>
 
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <button type="button" className="font-bold uppercase" onClick={}>
+          <button
+            type="button"
+            className="font-bold uppercase"
+            onClick={handleClick}
+          >
             Buscar Proyecto
           </button>
           <Link to="/proyectos" className="font-bold uppercase">
@@ -31,7 +36,7 @@ const Header = () => {
           </button>
         </div>
       </div>
-      <Search onClose={handleClick} open={modal}/>
+      <Search onClose={handleClick} open={modal} />
     </header>
   );
 };
